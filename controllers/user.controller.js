@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const User = require("../models/User");
-const { generateJwtToken } = require("../utils/generateJwtToken");
+const generateJwtToken  = require("../utils/generateJwtToken");
 
 exports.updateUser = (req, res) => {
     const update = req.body;
@@ -60,7 +60,7 @@ exports.login = async (req, res) => {
     }
 
     const user = await User.findOne({email});
-
+    
     if (!user) {
       return res.status(404).json({
         status: "fail",
@@ -83,9 +83,12 @@ exports.login = async (req, res) => {
       });
     }
     
-    
-    const token = generateJwtToken(user);
-    
+    let token;
+    try {
+      token = generateJwtToken(user);
+    } catch (error) {
+      console.log("error on generating token", error);
+    }    
 
     const { password: pwd, ...others } = user.toObject();
 
