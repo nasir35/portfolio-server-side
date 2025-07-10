@@ -1,0 +1,10 @@
+const userController = require("../controllers/user.controller");
+const express = require("express");
+const verifyToken = require("../middlewares/verifyToken");
+const router = express.Router();
+router.get("/:query", verifyToken, userController.getUser);
+router.get("/getAllUsers", verifyToken, userController.getAllUsers);
+router.put("/updateUser", verifyToken, userController.updateUser);
+router.post("/login", userController.login);
+router.post("/register", verifyToken, userController.createUser);
+module.exports = router;
