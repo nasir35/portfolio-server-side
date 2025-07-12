@@ -1,8 +1,15 @@
+const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 const cloudinary = require("../config/cloudinary.config");
 
 exports.uploadMultipleImages = async (req, res) => {
   try {
+    const projectName = req.body.projectName || "project";
+    const getPublicId = (originalname, label) => {
+      const ext = path.extname(originalname);
+      return `${projectName}_${label}_${uuidv4()}${ext}`;
+    };
+
     const thumbnailFile = req.files?.thumbnail?.[0];
     const galleryFiles = req.files?.gallery || [];
 
@@ -20,8 +27,8 @@ exports.uploadMultipleImages = async (req, res) => {
           .upload_stream(
             {
               resource_type: "image",
-              upload_preset: "product_images",
-              public_id: `thumbnail_${uuidv4()}`,
+              upload_preset: "portfolio_images",
+              public_id: getPublicId(thumbnailFile.originalname, "thumbnail"),
             },
             (error, result) => {
               if (error) reject(error);
@@ -34,15 +41,15 @@ exports.uploadMultipleImages = async (req, res) => {
       thumbnailUrl = result.secure_url;
     }
 
-    // Upload gallery images
-    const galleryUploadPromises = galleryFiles.map((file) => {
+    // Upload gallery
+    const galleryUploadPromises = galleryFiles.map((file, i) => {
       return new Promise((resolve, reject) => {
         cloudinary.uploader
           .upload_stream(
             {
               resource_type: "image",
-              upload_preset: "product_images",
-              public_id: `gallery_${uuidv4()}`,
+              upload_preset: "portfolio_images",
+              public_id: getPublicId(thumbnailFile.originalname, "thumbnail"),
             },
             (error, result) => {
               if (error) reject(error);
@@ -55,7 +62,6 @@ exports.uploadMultipleImages = async (req, res) => {
 
     const galleryUrls = await Promise.all(galleryUploadPromises);
 
-    // Send response
     res.status(200).json({
       success: true,
       thumbnailUrl,
