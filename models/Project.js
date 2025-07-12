@@ -18,11 +18,11 @@ const projectSchema = new mongoose.Schema(
       type: [String],
       required: true,
     },
-    thumbnail: {
+    thumbnailUrl: {
       type: String,
       required: true,
     },
-    gallery: {
+    galleryUrls: {
       type: [String],
       required: true,
     },
